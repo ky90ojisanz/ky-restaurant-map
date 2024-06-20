@@ -10,8 +10,10 @@ export async function GET(request) {
   const apiUrl = `https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=${apiKey}&keyword=${query}&format=json&count=10`;
 
   try {
-    const response = await fetch(apiUrl);
     const data = await response.json();
+    console.log(response.body);
+
+    const response = await fetch(apiUrl);
 
     return NextResponse.json(data.results.shop);
   } catch (error) {
