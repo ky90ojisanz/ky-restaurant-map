@@ -11,8 +11,8 @@ export async function GET(request) {
 
   try {
     const response = await fetch(apiUrl);
-    console.log(response.body);
     const data = await response.json();
+    console.log(data);
 
     return NextResponse.json(data.results.shop);
   } catch (error) {
