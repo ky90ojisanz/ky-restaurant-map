@@ -12,8 +12,7 @@ export async function GET(request) {
   try {
     const response = await fetch(apiUrl);
     const data = await response.json();
-    console.log(data);
-    console.log(JSON.stringify(data.results.shop));
+    console.log(JSON.stringify(data.results));
 
     return NextResponse.json(data.results.shop);
   } catch (error) {
