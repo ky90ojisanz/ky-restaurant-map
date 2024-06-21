@@ -91,6 +91,12 @@ const Map = () => {
       <SearchBox onPlacesChanged={handlePlacesChanged} />
       <GoogleMapComponent markers={markers} />
       <SearchModal onModalClose={handleModalClose} />
+      <p>
+        Powered by{" "}
+        <a href="http://webservice.recruit.co.jp/">
+          ホットペッパーグルメ Webサービス
+        </a>
+      </p>
     </div>
   );
 };

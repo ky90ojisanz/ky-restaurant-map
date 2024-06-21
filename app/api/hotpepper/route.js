@@ -6,8 +6,8 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("query") || "";
 
-  const apiKey = process.env.NEXT_PUBLIC_HOTPEPPER_API_KEY;
-  const apiUrl = `https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=${apiKey}&keyword=${query}&format=json&count=10`;
+  const apiKey = process.env.HOTPEPPER_API_KEY;
+  const apiUrl = `https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=${apiKey}&keyword=${query}&format=json&count=5`;
 
   try {
     const response = await fetch(apiUrl);
