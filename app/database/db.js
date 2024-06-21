@@ -12,6 +12,12 @@ const __dirname = dirname(__filename);
 const dbDir = path.resolve(__dirname);
 const dbPath = path.join(dbDir, "data.db");
 
+// ディレクトリが存在しない場合は作成
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+  console.log(`Created directory: ${dbDir}`);
+}
+
 // データベースファイルが存在するか確認し、存在しない場合は作成
 if (!fs.existsSync(dbPath)) {
   // データベースを新規作成
