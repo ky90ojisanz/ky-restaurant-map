@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -7,9 +8,11 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// データベースのファイルパスを設定
-const dbPath = path.resolve(__dirname, "data.db");
-
+// ディレクトリが存在するか確認
+const dbDir = path.resolve(__dirname);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 // データベース接続を初期化
 const db = new Database(dbPath);
 
