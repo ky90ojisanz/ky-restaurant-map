@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // データベースのファイルパスを設定
-const dbDir = path.resolve(__dirname, "database");
+const dbDir = path.resolve(__dirname);
 const dbPath = path.join(dbDir, "data.db");
 
 // ディレクトリが存在するか確認し、存在しない場合は作成
