@@ -12,26 +12,28 @@ const __dirname = dirname(__filename);
 const dbDir = path.resolve(__dirname);
 const dbPath = path.join(dbDir, "data.db");
 
-// ディレクトリが存在するか確認し、存在しない場合は作成
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+// データベースファイルが存在するか確認し、存在しない場合は作成
+if (!fs.existsSync(dbPath)) {
+  // データベースを新規作成
+  console.log(`Database file ${dbPath} does not exist. Creating new database.`);
+  const db = new Database(dbPath);
+  const createTable = `
+  CREATE TABLE IF NOT EXISTS selected_shops (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    lat REAL NOT NULL,
+    lng REAL NOT NULL
+  );
+  `;
+  db.exec(createTable);
+  console.log(`Database file ${dbPath} created and table initialized.`);
+  db.close(); // 初期化後に一度データベースを閉じる
+} else {
+  console.log(`Database file ${dbPath} already exists.`);
 }
 
 // データベース接続を初期化
 const db = new Database(dbPath);
-
-// テーブルを作成
-const createTable = `
-CREATE TABLE IF NOT EXISTS selected_shops (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  lat REAL NOT NULL,
-  lng REAL NOT NULL
-);
-`;
-
-db.exec(createTable);
+console.log(`Database connected at ${dbPath}`);
 
 export default db;
-
-console.log(`Database connected at ${dbPath}`);
