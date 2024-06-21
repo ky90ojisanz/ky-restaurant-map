@@ -1,6 +1,6 @@
 import Database from "better-sqlite3";
-import fs from "fs";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -8,12 +8,15 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// ディレクトリが存在するか確認
-console.log("Database path:", dbPath);
-const dbDir = path.resolve(__dirname);
+// データベースのファイルパスを設定
+const dbDir = path.resolve(__dirname, "database");
+const dbPath = path.join(dbDir, "data.db");
+
+// ディレクトリが存在するか確認し、存在しない場合は作成
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
+
 // データベース接続を初期化
 const db = new Database(dbPath);
 
@@ -30,3 +33,5 @@ CREATE TABLE IF NOT EXISTS selected_shops (
 db.exec(createTable);
 
 export default db;
+
+console.log(`Database connected at ${dbPath}`);
