@@ -44,6 +44,7 @@ const Map = () => {
   }, [fetchMarkersFromDB, updateMarkers]);
 
   const handleModalClose = () => {
+    fetchMarkersFromDB;
     setUpdateMarkers((prev) => !prev); // マーカーの更新をトリガー
   };
 
