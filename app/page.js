@@ -49,10 +49,14 @@ const Map = () => {
 
   const handlePlacesChanged = async (query) => {
     const res = await axios.get(
-      `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.NEXT_PUBLIC_GEOCODE_API_KEY}`
     );
+    console.log(res.data);
     const { location } = res.data.results[0].geometry;
-    setMarkers([{ lat: location.lat, lng: location.lng }]);
+    new google.maps.Map(document.getElementById("map"), {
+      center: { lat: location.lat, lng: location.lng },
+      zoom: 15,
+    });
   };
 
   if (loadError) return "Error loading maps";

@@ -14,7 +14,6 @@ export async function GET(req, res) {
         return res.status(500).json({ error: error.message });
       }
       // データをクライアントに返す
-      console.log(data);
       return NextResponse.json(data);
     } catch (error) {
       console.error("Unexpected error:", error);
