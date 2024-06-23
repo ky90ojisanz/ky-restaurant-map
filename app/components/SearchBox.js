@@ -19,6 +19,8 @@ const Input = styled.input`
   border-radius: 8px;
   outline: none;
   flex: 1;
+  color: #000;
+  background-color: #fff;
   margin-right: 10px;
   transition: border-color 0.3s;
 
