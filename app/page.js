@@ -4,7 +4,6 @@ import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
 import axios from "axios";
 import SearchBox from "./components/SearchBox";
 import FloatingButton from "./components/FloatingButton";
-import RestaurantList from "./components/RestaurantList";
 import SearchModal from "./components/SearchModal";
 import GoogleMapComponent from "./components/GoogleMapComponent";
 
@@ -34,8 +33,10 @@ const Map = () => {
   const fetchMarkersFromDB = useCallback(async () => {
     // データベースからマーカー情報を取得
     const response = await fetch("/api/get-markers");
-    const data = await response.json();
-    setMarkers(data);
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) setMarkers(data);
+    }
   }, []);
 
   useEffect(() => {
@@ -67,20 +68,6 @@ const Map = () => {
 
   const handleCloseModal = () => {
     setIsSearchModalVisible(false);
-  };
-
-  const handleRestaurantSelect = async (restaurant) => {
-    setSelectedRestaurant(restaurant);
-    const geoRes = await axios.get(
-      `https://maps.googleapis.com/maps/api/geocode/json?address=${restaurant.address}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
-    );
-    const { location } = geoRes.data.results[0].geometry;
-    await axios.post("/api/saveRestaurant", {
-      ...restaurant,
-      lat: location.lat,
-      lng: location.lng,
-    });
-    setMarkers([...markers, { lat: location.lat, lng: location.lng }]);
   };
 
   if (loadError) return "Error loading maps";

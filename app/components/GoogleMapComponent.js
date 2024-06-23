@@ -9,11 +9,34 @@ const GoogleMapComponent = ({ markers }) => {
     });
 
     // 既存のマーカーをクリア
-    markers.forEach((marker) => {
-      new google.maps.Marker({
-        position: { lat: marker.lat, lng: marker.lng },
+    markers.forEach((markerData) => {
+      const marker = new google.maps.Marker({
+        position: { lat: markerData.lat, lng: markerData.lng },
         map: map,
-        title: marker.name,
+        title: markerData.name,
+      });
+      const contentString = `
+      <div id="content">
+      <div id="siteNotice"></div>
+      <h1 id="firstHeading" class="firstHeading">店名：${markerData.name}</h1>
+      <div id="bodyContent">
+        <p><b>一言コメント：</b>${markerData.comment}</p>
+        <p>ジャンル：${markerData.genre}</p>
+        <p>アクセス：${markerData.access}</p>
+        <p>営業時間：${markerData.open}</p>
+        <p>URL： <a href=${markerData.url}>${markerData.url}</p>
+      </div>
+      </div >
+      `;
+      const infowindow = new google.maps.InfoWindow({
+        content: contentString,
+        ariaLabel: markerData.name,
+      });
+      marker.addListener("click", () => {
+        infowindow.open({
+          anchor: marker,
+          map,
+        });
       });
     });
   }, [markers]);
