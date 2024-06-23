@@ -14,6 +14,7 @@ const SearchModal = ({ onModalClose }) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [message, setMessage] = useState("");
+  const [comment, setComment] = useState("");
 
   const openModal = () => {
     setIsOpen(true);
@@ -29,18 +30,22 @@ const SearchModal = ({ onModalClose }) => {
 
   const handleSave = async (shop) => {
     try {
-      const selectedShop = {
+      const restaurant = {
         name: shop.name,
+        comment: comment,
+        genre: shop.genre.name,
+        access: shop.access,
+        open: shop.open,
+        url: shop.urls.pc,
         lat: shop.lat,
         lng: shop.lng,
       };
-
-      const response = await fetch("/api/save-shop", {
+      const response = await fetch("/api/add-markers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(selectedShop),
+        body: JSON.stringify(restaurant),
       });
 
       const result = await response.json();
@@ -104,9 +109,16 @@ const SearchModal = ({ onModalClose }) => {
                       <strong>{shop.name}</strong>
                     </p>
                     <p>{shop.address}</p>
-                    <p>{shop.catch}</p>
+                    <p>{shop.genre.name}</p>
                     <p>{shop.access}</p>
                     <p>{shop.open}</p>
+                    <input
+                      type="text"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="一言コメント"
+                      style={inputStyle}
+                    />
                     <button
                       style={confirmButtonStyle}
                       onClick={() => handleSave(shop)}
@@ -122,6 +134,7 @@ const SearchModal = ({ onModalClose }) => {
           )}
         </div>
       </Modal>
+      <style>{mediaQueryStyles}</style>
     </div>
   );
 };
@@ -152,6 +165,9 @@ const modalStyles = {
     backgroundColor: "#fff",
     borderRadius: "4px",
     boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+    width: "80%", // 初期設定として幅を80%に設定
+    maxHeight: "90vh", // モーダルの最大高さを設定
+    overflow: "auto", // モーダル内でスクロール可能にする
   },
 };
 
@@ -160,6 +176,9 @@ const inputStyle = {
   padding: "10px",
   margin: "10px 0",
   fontSize: "16px",
+  color: "#000",
+  backgroundColor: "#fff",
+  border: "1px solid #000",
 };
 
 const searchButtonStyle = {
@@ -196,8 +215,10 @@ const closeButtonStyle = {
 
 const resultsContainerStyle = {
   marginTop: "20px",
-  maxHeight: "1000px",
+  maxHeight: "600px", // モバイルでも見やすいように高さを調整
   overflowY: "auto",
+  width: "100%", // モバイルで幅を100%に設定
+  boxSizing: "border-box", // パディングを含む幅の計算
 };
 
 const resultItemStyle = {
@@ -205,6 +226,22 @@ const resultItemStyle = {
   marginBottom: "10px",
   border: "1px solid #ddd",
   borderRadius: "4px",
+  color: "#000",
+  backgroundColor: "#fff",
 };
+
+// メディアクエリを使ってモバイルデバイス向けのスタイルを追加
+const mediaQueryStyles = `
+  @media (max-width: 600px) {
+    .modalContent {
+      width: 90%; // モバイルでのモーダルの幅を調整
+      maxHeight: 80%; // モバイルでの最大高さを調整
+    }
+    .resultItem {
+      padding: 8px; // モバイルでのアイテムパディングを調整
+      fontSize: 14px; // モバイルでのフォントサイズを調整
+    }
+  }
+`;
 
 export default SearchModal;
