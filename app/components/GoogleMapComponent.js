@@ -8,6 +8,26 @@ const GoogleMapComponent = ({ markers }) => {
       zoom: 15,
     });
 
+    // 現在位置を取得する
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+
+          map.setCenter(pos);
+        },
+        () => {
+          handleLocationError(true, infoWindow, map.getCenter());
+        }
+      );
+    } else {
+      // Geolocationがサポートされていない場合のエラーハンドリング
+      handleLocationError(false, infoWindow, map.getCenter());
+    }
+
     // 既存のマーカーをクリア
     markers.forEach((markerData) => {
       const marker = new google.maps.Marker({

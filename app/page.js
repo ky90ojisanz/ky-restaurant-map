@@ -27,7 +27,6 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const [updateMarkers, setUpdateMarkers] = useState(false);
   const [restaurants, setRestaurants] = useState([]);
-  //  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
 
   const fetchMarkersFromDB = useCallback(async () => {
@@ -56,21 +55,6 @@ const Map = () => {
     setMarkers([{ lat: location.lat, lng: location.lng }]);
   };
 
-  // const handleRestaurantSearch = async () => {
-  //   const res = await axios.get(
-  //     `https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=YOUR_HOTPEPPER_API_KEY&lat=35.6895&lng=139.6917&range=2&format=json`
-  //   );
-  //   setRestaurants(res.data.results.shop);
-  // };
-
-  const handleButtonClick = () => {
-    setIsSearchModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsSearchModalVisible(false);
-  };
-
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
 
@@ -90,14 +74,3 @@ const Map = () => {
 };
 
 export default Map;
-
-/* <GoogleMap
-mapContainerStyle={mapContainerStyle}
-zoom={15}
-center={center}
-ref={mapRef}
->
-{markers.map((marker, index) => (
-  <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} />
-))}
-</GoogleMap> */
