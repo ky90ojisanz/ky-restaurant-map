@@ -61,7 +61,17 @@ const GoogleMapComponent = ({ markers }) => {
     });
   }, [markers]);
 
-  return <div id="map" style={{ height: "1200px", width: "100%" }}></div>;
+  return (
+    <div
+      id="map"
+      style={{
+        height: "1200px",
+        width: "100%",
+        color: "#000",
+        backgroundColor: "#FFF",
+      }}
+    ></div>
+  );
 };
 
 export default GoogleMapComponent;
