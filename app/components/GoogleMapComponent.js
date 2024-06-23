@@ -44,7 +44,7 @@ const GoogleMapComponent = ({ markers }) => {
         <p>ジャンル：${markerData.genre}</p>
         <p>アクセス：${markerData.access}</p>
         <p>営業時間：${markerData.open}</p>
-        <p>URL： <a href=${markerData.url}>${markerData.url}</p>
+        <p>URL： <a href=${markerData.url} target="_blank" rel="noopener">${markerData.url}</p>
       </div>
       </div >
       `;
