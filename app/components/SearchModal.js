@@ -40,8 +40,6 @@ const SearchModal = ({ onModalClose }) => {
         lat: shop.lat,
         lng: shop.lng,
       };
-
-      console.log(restaurant);
       const response = await fetch("/api/add-markers", {
         method: "POST",
         headers: {
@@ -178,6 +176,8 @@ const inputStyle = {
   padding: "10px",
   margin: "10px 0",
   fontSize: "16px",
+  color: "#000",
+  backgroundColor: "#fff",
 };
 
 const searchButtonStyle = {
