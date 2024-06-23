@@ -178,6 +178,7 @@ const inputStyle = {
   fontSize: "16px",
   color: "#000",
   backgroundColor: "#fff",
+  border: "1px solid #000",
 };
 
 const searchButtonStyle = {
@@ -225,6 +226,8 @@ const resultItemStyle = {
   marginBottom: "10px",
   border: "1px solid #ddd",
   borderRadius: "4px",
+  color: "#000",
+  backgroundColor: "#fff",
 };
 
 // メディアクエリを使ってモバイルデバイス向けのスタイルを追加
