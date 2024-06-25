@@ -8,7 +8,6 @@ import SearchModal from "./components/SearchModal";
 import GoogleMapComponent from "./components/GoogleMapComponent";
 
 const libraries = ["places"];
-let renderingcount = 0;
 const Map = () => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -18,7 +17,7 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const [updateMarkers, setUpdateMarkers] = useState(false);
 
-  const fetchMarkersFromDB = async () => {
+  const fetchMarkersFromDB = useCallback(async () => {
     // データベースからマーカー情報を取得
     const response = await fetch("/api/get-markers");
     if (response.ok) {
@@ -26,14 +25,14 @@ const Map = () => {
       console.log(data);
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
-  };
+  }, [updateMarkers]);
 
-  // useEffect(() => {
-  //   fetchMarkersFromDB();
-  // }, [fetchMarkersFromDB, setMarkers]);
+  useEffect(() => {
+    fetchMarkersFromDB();
+  }, [fetchMarkersFromDB]);
 
   const handleModalClose = () => {
-    fetchMarkersFromDB(); // マーカーの更新をトリガー
+    setUpdateMarkers((prev) => !prev); // updateMarkersの状態をトグルしてfetchMarkersFromDBをトリガー
   };
 
   const handlePlacesChanged = async (query) => {
@@ -49,9 +48,6 @@ const Map = () => {
 
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
-
-  //初回起動時はデータを設定する
-  fetchMarkersFromDB();
 
   return (
     <div>
