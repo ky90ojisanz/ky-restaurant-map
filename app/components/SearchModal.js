@@ -23,12 +23,13 @@ const SearchModal = ({ onModalClose }) => {
   const closeModal = () => {
     setIsOpen(false);
     setResults([]); // モーダルを閉じたときに結果をクリア
+    setComment(""); // モーダルを閉じたときに結果をクリア
     if (onModalClose) {
       onModalClose(); // モーダルを閉じる際に親コンポーネントに通知
     }
   };
 
-  const handleSave = (shop) => {
+  const handleSave = async (shop) => {
     try {
       const restaurant = {
         name: shop.name,
@@ -40,7 +41,7 @@ const SearchModal = ({ onModalClose }) => {
         lat: shop.lat,
         lng: shop.lng,
       };
-      const response = fetch("/api/add-markers", {
+      const response = await fetch("/api/add-markers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +49,7 @@ const SearchModal = ({ onModalClose }) => {
         body: JSON.stringify(restaurant),
       });
 
-      const result = response.json();
+      const result = await response.json();
       setMessage(result.message);
     } catch (error) {
       console.error("Error saving data:", error);

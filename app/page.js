@@ -18,7 +18,7 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const [updateMarkers, setUpdateMarkers] = useState(false);
 
-  const fetchMarkersFromDB = useCallback(async () => {
+  const fetchMarkersFromDB = async () => {
     // データベースからマーカー情報を取得
     const response = await fetch("/api/get-markers");
     if (response.ok) {
@@ -26,11 +26,11 @@ const Map = () => {
       console.log(data);
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    fetchMarkersFromDB();
-  }, [fetchMarkersFromDB, setMarkers]);
+  // useEffect(() => {
+  //   fetchMarkersFromDB();
+  // }, [fetchMarkersFromDB, setMarkers]);
 
   const handleModalClose = () => {
     fetchMarkersFromDB(); // マーカーの更新をトリガー
@@ -49,6 +49,9 @@ const Map = () => {
 
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
+
+  //初回起動時はデータを設定する
+  fetchMarkersFromDB();
 
   return (
     <div>
