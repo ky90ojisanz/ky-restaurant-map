@@ -23,7 +23,12 @@ const Map = () => {
     if (response.ok) {
       const data = await response.json();
       console.log(data);
-      if (Array.isArray(data) && data.length > 0) setMarkers(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setMarkers(data);
+      }
+    }
+    if (modalClosed) {
+      setModalClosed(false);
     }
   }, [modalClosed]);
 
