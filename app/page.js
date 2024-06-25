@@ -16,6 +16,7 @@ const Map = () => {
 
   const [markers, setMarkers] = useState([]);
   const fetchMarkersFromDB = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     // データベースからマーカー情報を取得
     const response = await fetch("/api/get-markers");
     if (response.ok) {
