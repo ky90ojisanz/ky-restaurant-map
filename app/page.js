@@ -15,7 +15,7 @@ const Map = () => {
   });
 
   const [markers, setMarkers] = useState([]);
-  const [updateMarkers, setUpdateMarkers] = useState(false);
+  const [modalClosed, setModalClosed] = useState(false); // モーダルが閉じられたかどうかの状態
 
   const fetchMarkersFromDB = useCallback(async () => {
     // データベースからマーカー情報を取得
@@ -25,14 +25,21 @@ const Map = () => {
       console.log(data);
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
-  }, [updateMarkers]);
+  }, []);
 
   useEffect(() => {
     fetchMarkersFromDB();
   }, [fetchMarkersFromDB]);
 
+  useEffect(() => {
+    if (modalClosed) {
+      fetchMarkersFromDB(); // モーダルが閉じられた時に実行
+      setModalClosed(false); // 状態をリセット
+    }
+  }, [modalClosed, fetchMarkersFromDB]);
+
   const handleModalClose = () => {
-    setUpdateMarkers((prev) => !prev); // updateMarkersの状態をトグルしてfetchMarkersFromDBをトリガー
+    setModalClosed(true); // モーダルが閉じられたことを示す
   };
 
   const handlePlacesChanged = async (query) => {
