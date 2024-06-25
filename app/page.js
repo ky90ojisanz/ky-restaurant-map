@@ -23,23 +23,23 @@ const Map = () => {
     const response = await fetch("/api/get-markers");
     if (response.ok) {
       const data = await response.json();
+      console.log(data);
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
-  }, [renderingcount]);
+  }, []);
 
   useEffect(() => {
     fetchMarkersFromDB();
   }, [fetchMarkersFromDB, setMarkers]);
 
-  const handleModalClose = async () => {
-    renderingcount += 1; // マーカーの更新をトリガー
+  const handleModalClose = () => {
+    fetchMarkersFromDB(); // マーカーの更新をトリガー
   };
 
   const handlePlacesChanged = async (query) => {
     const res = await axios.get(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.NEXT_PUBLIC_GEOCODE_API_KEY}`
     );
-    console.log(res.data);
     const { location } = res.data.results[0].geometry;
     new google.maps.Map(document.getElementById("map"), {
       center: { lat: location.lat, lng: location.lng },
