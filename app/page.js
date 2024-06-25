@@ -25,18 +25,11 @@ const Map = () => {
       console.log(data);
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
-  }, []);
+  }, [modalClosed]);
 
   useEffect(() => {
     fetchMarkersFromDB();
   }, [fetchMarkersFromDB]);
-
-  useEffect(() => {
-    if (modalClosed) {
-      fetchMarkersFromDB(); // モーダルが閉じられた時に実行
-      setModalClosed(false); // 状態をリセット
-    }
-  }, [modalClosed, fetchMarkersFromDB]);
 
   const handleModalClose = () => {
     setModalClosed(true); // モーダルが閉じられたことを示す
