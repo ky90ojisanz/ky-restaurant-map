@@ -28,7 +28,7 @@ const SearchModal = ({ onModalClose }) => {
     }
   };
 
-  const handleSave = async (shop) => {
+  const handleSave = (shop) => {
     try {
       const restaurant = {
         name: shop.name,
@@ -40,7 +40,7 @@ const SearchModal = ({ onModalClose }) => {
         lat: shop.lat,
         lng: shop.lng,
       };
-      const response = await fetch("/api/add-markers", {
+      const response = fetch("/api/add-markers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ const SearchModal = ({ onModalClose }) => {
         body: JSON.stringify(restaurant),
       });
 
-      const result = await response.json();
+      const result = response.json();
       setMessage(result.message);
     } catch (error) {
       console.error("Error saving data:", error);
