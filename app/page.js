@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useRef, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
 import axios from "axios";
 import SearchBox from "./components/SearchBox";
@@ -8,26 +8,15 @@ import SearchModal from "./components/SearchModal";
 import GoogleMapComponent from "./components/GoogleMapComponent";
 
 const libraries = ["places"];
-const mapContainerStyle = {
-  width: "100vw",
-  height: "100vh",
-};
-const center = {
-  lat: 35.6895,
-  lng: 139.6917,
-};
-
+let renderingcount = 0;
 const Map = () => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
-  const mapRef = useRef();
   const [markers, setMarkers] = useState([]);
   const [updateMarkers, setUpdateMarkers] = useState(false);
-  const [restaurants, setRestaurants] = useState([]);
-  const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
 
   const fetchMarkersFromDB = useCallback(async () => {
     // データベースからマーカー情報を取得
@@ -36,14 +25,14 @@ const Map = () => {
       const data = await response.json();
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
-  }, []);
+  }, [renderingcount]);
 
   useEffect(() => {
     fetchMarkersFromDB();
   }, [fetchMarkersFromDB, setMarkers]);
 
   const handleModalClose = async () => {
-    fetchMarkersFromDB(); // マーカーの更新をトリガー
+    renderingcount += 1; // マーカーの更新をトリガー
   };
 
   const handlePlacesChanged = async (query) => {
