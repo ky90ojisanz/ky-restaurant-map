@@ -40,7 +40,7 @@ const Map = () => {
 
   useEffect(() => {
     fetchMarkersFromDB();
-  }, [fetchMarkersFromDB, updateMarkers]);
+  }, [fetchMarkersFromDB, setMarkers]);
 
   const handleModalClose = async () => {
     fetchMarkersFromDB(); // マーカーの更新をトリガー
