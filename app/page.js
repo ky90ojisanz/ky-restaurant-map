@@ -1,13 +1,13 @@
 "use client";
-import React, { useCallback, useState, useEffect } from "react";
-import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
+import React, { useState, useEffect } from "react";
+import { useLoadScript } from "@react-google-maps/api";
 import axios from "axios";
 import SearchBox from "./components/SearchBox";
-import FloatingButton from "./components/FloatingButton";
-import SearchModal from "./components/SearchModal";
 import GoogleMapComponent from "./components/GoogleMapComponent";
+import SearchModal from "./components/SearchModal";
 
 const libraries = ["places"];
+
 const Map = () => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -15,26 +15,41 @@ const Map = () => {
   });
 
   const [markers, setMarkers] = useState([]);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
+
   const fetchMarkersFromDB = async () => {
-    // データベースからマーカー情報を取得
-    const response = await fetch("/api/get-markers", { cache: "no-store" });
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Data fetched:", data);
-      if (Array.isArray(data) && data.length > 0) {
-        setMarkers(data);
+    try {
+      const response = await fetch("/api/get-markers", {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Data fetched:", data);
+        if (Array.isArray(data) && data.length > 0) {
+          setMarkers(data);
+        } else {
+          console.log("No markers found.");
+          setMarkers([]);
+        }
       } else {
-        console.log("No markers found.");
+        console.error("Failed to fetch markers:", response.statusText);
       }
+    } catch (error) {
+      console.error("Error fetching markers:", error);
     }
   };
 
   useEffect(() => {
     fetchMarkersFromDB();
-  }, []);
+  }, [updateTrigger]);
 
   const handleModalClose = () => {
-    fetchMarkersFromDB(); // モーダルが閉じられたときに再度マーカー情報を取得
+    setUpdateTrigger((prev) => prev + 1);
   };
 
   const handlePlacesChanged = async (query) => {
@@ -56,6 +71,9 @@ const Map = () => {
       <SearchBox onPlacesChanged={handlePlacesChanged} />
       <GoogleMapComponent markers={markers} />
       <SearchModal onModalClose={handleModalClose} />
+      <button onClick={() => setUpdateTrigger((prev) => prev + 1)}>
+        Refresh Markers
+      </button>
       <p>
         Powered by{" "}
         <a href="http://webservice.recruit.co.jp/">
