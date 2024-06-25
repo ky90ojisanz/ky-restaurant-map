@@ -17,7 +17,7 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const fetchMarkersFromDB = async () => {
     // データベースからマーカー情報を取得
-    const response = await fetch("/api/get-markers", { cache: "no-cache" });
+    const response = await fetch("/api/get-markers", { cache: "no-store" });
     if (response.ok) {
       const data = await response.json();
       console.log("Data fetched:", data);
