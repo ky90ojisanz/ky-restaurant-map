@@ -84,21 +84,26 @@ const SearchModal = ({ onModalClose }) => {
         style={modalStyles}
         contentLabel="Search Modal"
       >
-        <h2>飲食店検索</h2>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="検索キーワードを入力"
-          style={inputStyle}
-        />
-        <button onClick={handleSearch} style={searchButtonStyle}>
-          検索
-        </button>
-        <button onClick={closeModal} style={closeButtonStyle}>
-          閉じる
-        </button>
-
+        <h1>
+          <strong>飲食店検索</strong>
+        </h1>
+        <div style={controlStyle}>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="検索キーワードを入力"
+            style={inputStyle}
+          />
+          <div style={clickStyle}>
+            <button onClick={handleSearch} style={searchButtonStyle}>
+              検索
+            </button>
+            <button onClick={closeModal} style={closeButtonStyle}>
+              閉じる
+            </button>
+          </div>
+        </div>
         <div style={resultsContainerStyle}>
           {results.length > 0 ? (
             <div>
@@ -117,7 +122,7 @@ const SearchModal = ({ onModalClose }) => {
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                       placeholder="一言コメント"
-                      style={inputStyle}
+                      style={commentStyle}
                     />
                     <button
                       style={confirmButtonStyle}
@@ -171,10 +176,32 @@ const modalStyles = {
   },
 };
 
+const controlStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+};
+
+const clickStyle = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+};
+
 const inputStyle = {
-  width: "100%",
+  width: "80%",
   padding: "10px",
   margin: "10px 0",
+  fontSize: "16px",
+  color: "#000",
+  backgroundColor: "#fff",
+  border: "1px solid #000",
+};
+
+const commentStyle = {
+  width: "80%",
+  padding: "10px",
+  margin: "16px",
   fontSize: "16px",
   color: "#000",
   backgroundColor: "#fff",
@@ -222,12 +249,16 @@ const resultsContainerStyle = {
 };
 
 const resultItemStyle = {
-  padding: "10px",
-  marginBottom: "10px",
+  width: "88%",
+  padding: "16px",
+  marginLeft: "auto",
+  marginRight: "auto",
+  marginBottom: "16px",
   border: "1px solid #ddd",
   borderRadius: "4px",
   color: "#000",
   backgroundColor: "#fff",
+  boxShadow: "0 8px 4px rgba(0, 0, 0, 0.1)",
 };
 
 // メディアクエリを使ってモバイルデバイス向けのスタイルを追加
