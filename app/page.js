@@ -6,6 +6,8 @@ import SearchBox from "./components/SearchBox";
 import FloatingButton from "./components/FloatingButton";
 import SearchModal from "./components/SearchModal";
 import GoogleMapComponent from "./components/GoogleMapComponent";
+// import { useSession } from "next-auth/react";
+// import { useRouter } from "next/router";
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -25,9 +27,11 @@ const Map = () => {
 
   const mapRef = useRef();
   const [markers, setMarkers] = useState([]);
+  // const { data: session, status } = useSession();
   const [updateMarkers, setUpdateMarkers] = useState(false);
   const [restaurants, setRestaurants] = useState([]);
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
+  // const router = useRouter();
 
   const fetchMarkersFromDB = useCallback(async () => {
     // データベースからマーカー情報を取得
@@ -37,6 +41,13 @@ const Map = () => {
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
   }, []);
+
+  // useEffect(() => {
+  //   if (status === "loading") return; // セッションの読み込み中は何もしない
+  //   if (!session && status !== "loading") {
+  //     router.push("/login"); // ログインしていない場合、ログインページにリダイレクト
+  //   }
+  // }, [session, status, router]);
 
   useEffect(() => {
     fetchMarkersFromDB();
