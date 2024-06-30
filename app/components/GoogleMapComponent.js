@@ -7,7 +7,10 @@ const GoogleMapComponent = ({ markers }) => {
       center: { lat: 35.681236, lng: 139.767125 }, // 中心点を設定（例: 東京駅）
       zoom: 15,
     });
-
+    const infoWindow = new google.maps.InfoWindow({
+      content: "",
+      ariaLabel: "",
+    });
     // 現在位置を取得する
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -48,10 +51,6 @@ const GoogleMapComponent = ({ markers }) => {
       </div>
       </div >
       `;
-      const infowindow = new google.maps.InfoWindow({
-        content: contentString,
-        ariaLabel: markerData.name,
-      });
       marker.addListener("click", () => {
         infowindow.open({
           anchor: marker,
@@ -72,6 +71,16 @@ const GoogleMapComponent = ({ markers }) => {
       }}
     ></div>
   );
+};
+
+const handleLocationError = (browserHasGeolocation, infoWindow, pos) => {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(
+    browserHasGeolocation
+      ? "Error: The Geolocation service failed."
+      : "Error: Your browser doesn't support geolocation."
+  );
+  infoWindow.open(map);
 };
 
 export default GoogleMapComponent;
