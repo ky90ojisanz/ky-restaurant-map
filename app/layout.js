@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "../styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,16 +10,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="jp">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content={metadata.description} />
         <title>{metadata.title}</title>
       </head>
-      <body>
-        <div id="__app">{children}</div> {/* ルート要素を定義 */}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

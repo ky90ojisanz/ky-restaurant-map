@@ -5,8 +5,11 @@ import Modal from "react-modal";
 import axios from "axios";
 
 // クライアント側でのみ実行
+// if (typeof window !== "undefined") {
+//   Modal.setAppElement("#__next"); // ルート要素を設定
+// }
 if (typeof window !== "undefined") {
-  Modal.setAppElement("#__app"); // ルート要素を設定
+  Modal.setAppElement("body");
 }
 
 const SearchModal = ({ onModalClose }) => {
