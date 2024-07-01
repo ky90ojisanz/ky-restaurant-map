@@ -16,20 +16,28 @@ export default NextAuth({
   // オプションの設定をここに追加できます
   callbacks: {
     async signIn({ user, account, profile }) {
-      return true;
+      if (account == null || account.access_token == null) return false;
+      return await isJoinGuild(account.access_token);
     },
+
     async redirect({ url, baseUrl }) {
       return baseUrl;
     },
+
     async session({ session, token, user }) {
+      session.accessToken = token.accessToken;
       if (session?.user) {
-        session.user.id = token.sub;
+        session.user.id = token.id;
       }
       return session;
     },
+
     async jwt({ token, user, account, profile, isNewUser }) {
-      if (user) {
-        token.id = user.id;
+      if (account && account.access_token) {
+        token.accessToken = account.access_token;
+      }
+      if (profile) {
+        token.id = profile.id;
       }
       return token;
     },
@@ -49,3 +57,16 @@ export default NextAuth({
     error: "/auth/error", // エラーページのパスを指定
   },
 });
+
+async function isJoinGuild(accessToken) {
+  const res = await fetch("https://discordapp.com/api/users/@me/guilds", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  if (res.ok) {
+    const guilds = await res.json();
+    return guilds.some((guild) => guild.id === process.env.KY_OJI_GUILD_ID);
+  }
+  return false;
+}
