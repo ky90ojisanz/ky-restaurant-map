@@ -9,7 +9,7 @@ if (typeof window !== "undefined") {
   Modal.setAppElement("body");
 }
 
-const SearchModal = ({ onModalClose }) => {
+const SearchModal = ({ onModalClose, onShopSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -28,7 +28,7 @@ const SearchModal = ({ onModalClose }) => {
     }
   };
 
-  const handleSave = async (shop) => {
+  const selectShop = async (shop) => {
     try {
       const restaurant = {
         name: shop.name,
@@ -37,19 +37,10 @@ const SearchModal = ({ onModalClose }) => {
         access: shop.access,
         open: shop.open,
         url: shop.urls.pc,
-        lat: shop.lat,
-        lng: shop.lng,
+        lat: parseFloat(shop.lat),
+        lng: parseFloat(shop.lng),
       };
-      const response = await fetch("/api/add-markers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(restaurant),
-      });
-
-      const result = await response.json();
-      setMessage(result.message);
+      onShopSelect(restaurant); // 親コンポーネントに選択した店舗情報を通知
     } catch (error) {
       console.error("Error saving data:", error);
       setMessage("Error saving data.");
@@ -126,7 +117,7 @@ const SearchModal = ({ onModalClose }) => {
                     />
                     <button
                       style={confirmButtonStyle}
-                      onClick={() => handleSave(shop)}
+                      onClick={() => selectShop(shop)}
                     >
                       選択
                     </button>

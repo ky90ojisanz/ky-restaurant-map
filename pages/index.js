@@ -27,6 +27,7 @@ const Map = () => {
 
   const mapRef = useRef();
   const [markers, setMarkers] = useState([]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { data: session, status } = useSession();
   const [updateMarkers, setUpdateMarkers] = useState(false);
   const [restaurants, setRestaurants] = useState([]);
@@ -43,18 +44,25 @@ const Map = () => {
   }, []);
 
   useEffect(() => {
+    if (isInitialLoad) {
+      fetchMarkersFromDB();
+      setIsInitialLoad(false);
+    }
+  }, [fetchMarkersFromDB, isInitialLoad]);
+
+  useEffect(() => {
+    fetchMarkersFromDB();
+  }, [fetchMarkersFromDB, updateMarkers]);
+
+  useEffect(() => {
     if (status === "loading") return; // セッションの読み込み中は何もしない
     if (!session && status !== "loading") {
       router.push("/login"); // ログインしていない場合、ログインページにリダイレクト
     }
   }, [session, status, router]);
 
-  useEffect(() => {
-    fetchMarkersFromDB();
-  }, [fetchMarkersFromDB, updateMarkers]);
-
-  const handleModalClose = async () => {
-    fetchMarkersFromDB(); // マーカーの更新をトリガー
+  const handleShopSelect = (shop) => {
+    setMarkers([shop]);
   };
 
   const handlePlacesChanged = async (query) => {
@@ -78,7 +86,7 @@ const Map = () => {
     <div>
       <SearchBox onPlacesChanged={handlePlacesChanged} />
       <GoogleMapComponent markers={markers} />
-      <SearchModal onModalClose={handleModalClose} />
+      <SearchModal onShopSelect={handleShopSelect} />
       <p>
         Powered by{" "}
         <a href="http://webservice.recruit.co.jp/">
