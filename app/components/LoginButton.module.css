@@ -1,0 +1,60 @@
+.container {
+  font-family: "MS PGothic", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3",
+    sans-serif;
+  width: 800px;
+  margin: 0 auto;
+  background-color: #fffacd;
+  border: 2px solid #ff69b4;
+  padding: 10px;
+}
+
+.header {
+  background-color: #ff69ebe3;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.content {
+  display: flex;
+}
+
+.mainContent {
+  flex-grow: 1;
+  background-color: white;
+  padding: 10px;
+  border: 1px solid #69eeffd0;
+}
+
+.button {
+  background-color: #ff69b4;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.blinkingText {
+  animation: blink 1s linear infinite;
+  font-weight: bold;
+  color: #27ff14e3;
+}

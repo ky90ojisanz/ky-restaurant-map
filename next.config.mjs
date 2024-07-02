@@ -1,5 +1,5 @@
 // next.config.js
-export default {
+const nextConfig = {
   env: {
     HOTPEPPER_API_KEY: process.env.HOTPEPPER_API_KEY, // サーバーサイドでのみ使用
   },
@@ -9,3 +9,5 @@ export default {
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   },
 };
+
+export default nextConfig;
