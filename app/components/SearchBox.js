@@ -3,14 +3,30 @@
 import React, { useRef } from "react";
 import styled from "styled-components";
 
+const HeaderContainer = styled.header`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: #f0f0f0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
 const Container = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  padding: 10px 20px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 10px 15px;
+  }
 `;
 
 const Input = styled.input`
@@ -21,11 +37,18 @@ const Input = styled.input`
   flex: 1;
   color: #000;
   background-color: #fff;
-  margin-right: 10px;
   transition: border-color 0.3s;
+  margin-right: 10px;
+  width: calc(100% - 110px); // Subtracting button width and margin
 
   &:focus {
     border-color: #0070f3;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
   }
 `;
 
@@ -37,9 +60,14 @@ const Button = styled.button`
   color: #fff;
   cursor: pointer;
   transition: background-color 0.3s;
+  width: 100px; // Fixed width for the button
 
   &:hover {
     background-color: #005bb5;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;
 
@@ -54,10 +82,12 @@ const SearchBox = ({ onPlacesChanged }) => {
   };
 
   return (
-    <Container>
-      <Input type="text" ref={inputRef} placeholder="場所を検索" />
-      <Button onClick={handleSearch}>検索</Button>
-    </Container>
+    <HeaderContainer>
+      <Container>
+        <Input type="text" ref={inputRef} placeholder="場所を検索" />
+        <Button onClick={handleSearch}>検索</Button>
+      </Container>
+    </HeaderContainer>
   );
 };
 
