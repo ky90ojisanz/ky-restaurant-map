@@ -61,11 +61,19 @@ const Map = () => {
     const res = await axios.get(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.NEXT_PUBLIC_GEOCODE_API_KEY}`
     );
-    console.log(res.data);
     const { location } = res.data.results[0].geometry;
-    new google.maps.Map(document.getElementById("map"), {
+
+    // 既存のマップインスタンスを使用して中心を更新
+    const map = new google.maps.Map(document.getElementById("map"), {
       center: { lat: location.lat, lng: location.lng },
       zoom: 15,
+    });
+    // マーカーを再描画
+    markers.forEach((marker) => {
+      new google.maps.Marker({
+        position: { lat: marker.lat, lng: marker.lng },
+        map: map,
+      });
     });
   };
 
