@@ -21,6 +21,20 @@ const GoogleMapComponent = ({ markers }) => {
             lng: position.coords.longitude,
           };
           map.setCenter(pos);
+          // 現在地にマーカーを追加
+          new google.maps.Marker({
+            position: pos,
+            map: map,
+            title: "Your Location",
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              fillColor: "#4285F4",
+              fillOpacity: 1,
+              strokeColor: "#ffffff",
+              strokeWeight: 2,
+            },
+          });
         },
         () => {
           handleLocationError(true, infoWindowRef.current, map.getCenter());
