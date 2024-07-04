@@ -1,10 +1,9 @@
-"use client"; // クライアント側で動作するコンポーネントとして指定
+"use client";
 
 import { useState } from "react";
 import Modal from "react-modal";
 import axios from "axios";
 
-// クライアント側でのみ実行
 if (typeof window !== "undefined") {
   Modal.setAppElement("body");
 }
@@ -13,8 +12,6 @@ const SearchModal = ({ onModalClose }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const [message, setMessage] = useState("");
-  const [comment, setComment] = useState("");
 
   const openModal = () => {
     setIsOpen(true);
@@ -22,22 +19,24 @@ const SearchModal = ({ onModalClose }) => {
 
   const closeModal = () => {
     setIsOpen(false);
-    setQuery(""); // モーダルを閉じたときに文言をクリア
-    setMessage(""); // モーダルを閉じたときにメッセージをクリア
-    setComment(""); // モーダルを閉じたときにコメントをクリア
-    setResults([]); // モーダルを閉じたときに結果をクリア
+    setQuery("");
+    setResults([]);
     if (onModalClose) {
-      onModalClose(); // モーダルを閉じる際に親コンポーネントに通知
+      onModalClose();
     }
   };
 
-  const handleSave = async (shop) => {
+  const handleSave = async (shop, comment) => {
     const params = { name: shop.name };
     const shopName = new URLSearchParams(params);
     const response = await fetch(`/api/get-markers?${shopName}`);
     const data = await response.json();
     if (data.length > 0) {
-      setMessage("既に登録されています。");
+      setResults((prevResults) =>
+        prevResults.map((r) =>
+          r.id === shop.id ? { ...r, message: "既に登録されています。" } : r
+        )
+      );
       return;
     }
 
@@ -61,8 +60,17 @@ const SearchModal = ({ onModalClose }) => {
       });
 
       const result = await response.json();
+      setResults((prevResults) =>
+        prevResults.map((r) =>
+          r.id === shop.id ? { ...r, message: "保存しました。" } : r
+        )
+      );
     } catch (error) {
-      setMessage("DBに保存できませんでした");
+      setResults((prevResults) =>
+        prevResults.map((r) =>
+          r.id === shop.id ? { ...r, message: "DBに保存できませんでした" } : r
+        )
+      );
     }
     closeModal();
   };
@@ -76,7 +84,9 @@ const SearchModal = ({ onModalClose }) => {
       promise
         .then((response) => response.json())
         .then((jsondata) => {
-          setResults(jsondata);
+          setResults(
+            jsondata.map((shop) => ({ ...shop, comment: "", message: "" }))
+          );
         });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -134,18 +144,28 @@ const SearchModal = ({ onModalClose }) => {
                     <p>{shop.open}</p>
                     <input
                       type="text"
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
+                      value={shop.comment}
+                      onChange={(e) => {
+                        setResults((prevResults) =>
+                          prevResults.map((r) =>
+                            r.id === shop.id
+                              ? { ...r, comment: e.target.value }
+                              : r
+                          )
+                        );
+                      }}
                       placeholder="一言コメント"
                       style={commentStyle}
                     />
                     <button
                       style={confirmButtonStyle}
-                      onClick={() => handleSave(shop)}
+                      onClick={() => handleSave(shop, shop.comment)}
                     >
                       保存
                     </button>
-                    {message && <p style={{ color: "red" }}>{message}</p>}
+                    {shop.message && (
+                      <p style={{ color: "red" }}>{shop.message}</p>
+                    )}
                   </li>
                 ))}
               </ul>
