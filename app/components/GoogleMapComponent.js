@@ -1,17 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 const GoogleMapComponent = ({ markers }) => {
+  const mapRef = useRef(null);
+  const infoWindowRef = useRef(null);
+
   useEffect(() => {
-    // Google Maps API を使用して地図を初期化
     const map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: 35.681236, lng: 139.767125 }, // 中心点を設定（例: 東京駅）
+      center: { lat: 35.681236, lng: 139.767125 },
       zoom: 15,
     });
-    const infoWindow = new google.maps.InfoWindow({
-      content: "",
-      ariaLabel: "",
-    });
-    // 現在位置を取得する
+
+    mapRef.current = map;
+    infoWindowRef.current = new google.maps.InfoWindow();
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -19,43 +20,41 @@ const GoogleMapComponent = ({ markers }) => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-
           map.setCenter(pos);
         },
         () => {
-          handleLocationError(true, infoWindow, map.getCenter());
+          handleLocationError(true, infoWindowRef.current, map.getCenter());
         }
       );
     } else {
-      // Geolocationがサポートされていない場合のエラーハンドリング
-      handleLocationError(false, infoWindow, map.getCenter());
+      handleLocationError(false, infoWindowRef.current, map.getCenter());
     }
 
-    // 既存のマーカーをクリア
     markers.forEach((markerData) => {
       const marker = new google.maps.Marker({
         position: { lat: markerData.lat, lng: markerData.lng },
         map: map,
         title: markerData.name,
       });
+
       const contentString = `
-      <div id="content">
-      <div id="siteNotice"></div>
-      <h1 id="firstHeading" class="firstHeading">店名：${markerData.name}</h1>
-      <div id="bodyContent">
-        <p><b>一言コメント：</b>${markerData.comment}</p>
-        <p>ジャンル：${markerData.genre}</p>
-        <p>アクセス：${markerData.access}</p>
-        <p>営業時間：${markerData.open}</p>
-        <p>URL： <a href=${markerData.url} target="_blank" rel="noopener">${markerData.url}</p>
-      </div>
-      </div >
+        <div id="content">
+          <div id="siteNotice"></div>
+          <h1 id="firstHeading" class="firstHeading">店名：${markerData.name}</h1>
+          <div id="bodyContent">
+            <p><b>一言コメント：</b>${markerData.comment}</p>
+            <p>ジャンル：${markerData.genre}</p>
+            <p>アクセス：${markerData.access}</p>
+            <p>営業時間：${markerData.open}</p>
+            <p>URL： <a href=${markerData.url} target="_blank" rel="noopener">${markerData.url}</a></p>
+          </div>
+        </div>
       `;
+
       marker.addListener("click", () => {
-        infowindow.open({
-          anchor: marker,
-          map,
-        });
+        infoWindowRef.current.close(); // 前に開いていたInfoWindowを閉じる
+        infoWindowRef.current.setContent(contentString);
+        infoWindowRef.current.open(map, marker);
       });
     });
   }, [markers]);
@@ -80,7 +79,7 @@ const handleLocationError = (browserHasGeolocation, infoWindow, pos) => {
       ? "Error: The Geolocation service failed."
       : "Error: Your browser doesn't support geolocation."
   );
-  infoWindow.open(map);
+  infoWindow.open(mapRef.current);
 };
 
 export default GoogleMapComponent;
