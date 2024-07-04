@@ -22,6 +22,9 @@ const SearchModal = ({ onModalClose }) => {
 
   const closeModal = () => {
     setIsOpen(false);
+    setQuery(""); // モーダルを閉じたときに文言をクリア
+    setMessage(""); // モーダルを閉じたときにメッセージをクリア
+    setComment(""); // モーダルを閉じたときにコメントをクリア
     setResults([]); // モーダルを閉じたときに結果をクリア
     if (onModalClose) {
       onModalClose(); // モーダルを閉じる際に親コンポーネントに通知
@@ -29,6 +32,15 @@ const SearchModal = ({ onModalClose }) => {
   };
 
   const handleSave = async (shop) => {
+    const params = { name: shop.name };
+    const shopName = new URLSearchParams(params);
+    const response = await fetch(`/api/get-markers?${shopName}`);
+    const data = await response.json();
+    if (data.length > 0) {
+      setMessage("既に登録されています。");
+      return;
+    }
+
     try {
       const restaurant = {
         name: shop.name,
@@ -49,10 +61,8 @@ const SearchModal = ({ onModalClose }) => {
       });
 
       const result = await response.json();
-      setMessage(result.message);
     } catch (error) {
-      console.error("Error saving data:", error);
-      setMessage("Error saving data.");
+      setMessage("DBに保存できませんでした");
     }
     closeModal();
   };
@@ -85,8 +95,13 @@ const SearchModal = ({ onModalClose }) => {
         contentLabel="Search Modal"
       >
         <h1>
-          <strong>飲食店検索</strong>
+          <strong>飲食店DB保存画面</strong>
         </h1>
+        <h2>
+          HotPepperグルメサーチAPIを使って飲食店を検索
+          <br />
+          検索した店情報をDBに保存することができます。
+        </h2>
         <div style={controlStyle}>
           <input
             type="text"
@@ -128,8 +143,9 @@ const SearchModal = ({ onModalClose }) => {
                       style={confirmButtonStyle}
                       onClick={() => handleSave(shop)}
                     >
-                      選択
+                      保存
                     </button>
+                    {message && <p style={{ color: "red" }}>{message}</p>}
                   </li>
                 ))}
               </ul>
