@@ -21,6 +21,12 @@ const SearchModal = ({ onModalClose }) => {
     setIsOpen(false);
     setQuery("");
     setResults([]);
+  };
+
+  const closeModalSave = () => {
+    setIsOpen(false);
+    setQuery("");
+    setResults([]);
     if (onModalClose) {
       onModalClose();
     }
@@ -72,7 +78,7 @@ const SearchModal = ({ onModalClose }) => {
         )
       );
     }
-    closeModal();
+    closeModalSave();
   };
 
   const handleSearch = () => {

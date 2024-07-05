@@ -1,77 +1,84 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const GoogleMapComponent = ({ markers }) => {
+const GoogleMapComponent = ({ markers, center }) => {
   const mapRef = useRef(null);
   const infoWindowRef = useRef(null);
+  const [userLocation, setUserLocation] = useState(null);
 
   useEffect(() => {
-    const map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: 35.681236, lng: 139.767125 },
-      zoom: 15,
-    });
-
-    mapRef.current = map;
-    infoWindowRef.current = new google.maps.InfoWindow();
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          map.setCenter(pos);
-          // 現在地にマーカーを追加
-          new google.maps.Marker({
-            position: pos,
-            map: map,
-            title: "Your Location",
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 10,
-              fillColor: "#4285F4",
-              fillOpacity: 1,
-              strokeColor: "#ffffff",
-              strokeWeight: 2,
-            },
-          });
-        },
-        () => {
-          handleLocationError(true, infoWindowRef.current, map.getCenter());
-        }
-      );
-    } else {
-      handleLocationError(false, infoWindowRef.current, map.getCenter());
-    }
-
-    markers.forEach((markerData) => {
-      const marker = new google.maps.Marker({
-        position: { lat: markerData.lat, lng: markerData.lng },
-        map: map,
-        title: markerData.name,
+    const initMap = () => {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: center,
+        zoom: 15,
       });
 
-      const contentString = `
-        <div id="content">
-          <div id="siteNotice"></div>
-          <h1 id="firstHeading" class="firstHeading">店名：${markerData.name}</h1>
-          <div id="bodyContent">
-            <p><b>一言コメント：</b>${markerData.comment}</p>
-            <p>ジャンル：${markerData.genre}</p>
-            <p>アクセス：${markerData.access}</p>
-            <p>営業時間：${markerData.open}</p>
-            <p>URL： <a href=${markerData.url} target="_blank" rel="noopener">${markerData.url}</a></p>
+      mapRef.current = map;
+      infoWindowRef.current = new google.maps.InfoWindow();
+
+      // ユーザーの位置を取得し、青いマーカーを追加
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            setUserLocation(pos);
+
+            new google.maps.Marker({
+              position: pos,
+              map: map,
+              title: "Your Location",
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 2,
+              },
+            });
+          },
+          () => {
+            handleLocationError(true, infoWindowRef.current, map.getCenter());
+          }
+        );
+      } else {
+        handleLocationError(false, infoWindowRef.current, map.getCenter());
+      }
+
+      // マーカーの追加
+      markers.forEach((markerData) => {
+        const marker = new google.maps.Marker({
+          position: { lat: markerData.lat, lng: markerData.lng },
+          map: map,
+          title: markerData.name,
+        });
+
+        const contentString = `
+          <div id="content">
+            <div id="siteNotice"></div>
+            <h1 id="firstHeading" class="firstHeading">店名：${markerData.name}</h1>
+            <div id="bodyContent">
+              <p><b>一言コメント：</b>${markerData.comment}</p>
+              <p>ジャンル：${markerData.genre}</p>
+              <p>アクセス：${markerData.access}</p>
+              <p>営業時間：${markerData.open}</p>
+              <p>URL： <a href=${markerData.url} target="_blank" rel="noopener">${markerData.url}</a></p>
+            </div>
           </div>
-        </div>
-      `;
+        `;
 
-      marker.addListener("click", () => {
-        infoWindowRef.current.close(); // 前に開いていたInfoWindowを閉じる
-        infoWindowRef.current.setContent(contentString);
-        infoWindowRef.current.open(map, marker);
+        marker.addListener("click", () => {
+          infoWindowRef.current.close();
+          infoWindowRef.current.setContent(contentString);
+          infoWindowRef.current.open(map, marker);
+        });
       });
-    });
-  }, [markers]);
+    };
+
+    initMap();
+  }, [markers, center]);
 
   return (
     <div
