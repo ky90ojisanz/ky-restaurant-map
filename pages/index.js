@@ -31,9 +31,9 @@ const Map = () => {
   }, []);
 
   useEffect(() => {
-    if (status === "loading") return;
+    if (status === "loading") return; // セッションの読み込み中は何もしない
     if (!session && status !== "loading") {
-      router.push("/login");
+      router.push("/login"); // ログインしていない場合、ログインページにリダイレクト
     }
   }, [session, status, router]);
 
@@ -61,7 +61,7 @@ const Map = () => {
   }, [isInitialLoad]);
 
   const handleModalClose = async () => {
-    fetchMarkersFromDB();
+    fetchMarkersFromDB(); // データ追加に伴いDBから取得して
   };
 
   const handlePlacesChanged = async (query) => {

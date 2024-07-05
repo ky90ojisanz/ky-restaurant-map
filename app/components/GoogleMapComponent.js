@@ -70,7 +70,7 @@ const GoogleMapComponent = ({ markers, center }) => {
         `;
 
         marker.addListener("click", () => {
-          infoWindowRef.current.close();
+          infoWindowRef.current.close(); // 前に開いていたInfoWindowを閉じる
           infoWindowRef.current.setContent(contentString);
           infoWindowRef.current.open(map, marker);
         });
