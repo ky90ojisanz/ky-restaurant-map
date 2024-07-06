@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { load } from "cheerio";
-import axios from "axios";
 import { fetchHotPepperData } from "../hotpepper/route";
 import { insertFromDiscord } from "../add-markers/route";
 import { fetchDBByName } from "../get-markers/route";
@@ -23,75 +22,15 @@ export async function POST(request) {
     if (urls.length > 0) {
       for (const url of urls) {
         console.log("URL:", url);
-        const response = await axios.get(url);
-        const html = response.data;
-        // cheerioを使用してHTMLを解析
-        const $ = load(html);
-
-        // 必要な情報を抽出
-        if (url.includes("tabelog")) {
-          // 食べログの場合
-          // 店名を取得
-          const storeName = $("h2.display-name span").first().text().trim();
-
-          // 住所を取得
-          const address = $('th:contains("住所")')
-            .next("td")
-            .find("p.rstinfo-table__address")
-            .text()
-            .trim()
-            .replace(/\s+/g, " ");
-          restaurantInfo.push({
-            restaurantName: storeName,
-            restaurantAddress: address,
-          });
-        } else if (url.includes("hotpepper")) {
-          // ホットペッパーの場合
-          const jsonLdScript = $('script[type="application/ld+json"]').html();
-          const jsonData = JSON.parse(jsonLdScript);
-
-          // Extract store name and address details
-          const storeName = jsonData.name;
-          const address = jsonData.address;
-          const addressString = `${address.addressRegion}${address.addressLocality}${address.streetAddress}`;
-
-          restaurantInfo.push({
-            restaurantName: storeName,
-            restaurantAddress: addressString,
-          });
-        }
+        await modifyHPInfo(response, url, restaurantInfo);
       }
     } else {
-      const restaurantNames = await extractRestaurantNames(content);
-      // JSON.parseを使用して、文字列を配列に変換します
-      const jsonString = restaurantNames.replace(/'/g, '"');
-      const responseArray = JSON.parse(jsonString);
-      responseArray.forEach((v) => {
-        if (v !== "Nothing") {
-          restaurantInfo.push({
-            restaurantName: v,
-            restaurantAddress: "",
-          });
-        }
-      });
+      await extractRestaurantNames(content, restaurantInfo);
     }
     // ここでメッセージの解析を行います
     for (let i = 0; i < restaurantInfo.length; i++) {
-      const restaurant = `${restaurantInfo[i].restaurantName} ${restaurantInfo[i].restaurantAddress}`;
-      const data = await fetchHotPepperData(restaurant);
-      if (data.length > 0) {
-        const response = await fetchDBByName(data[0].name);
-        const existData = await response.json();
-        if (existData.length > 0) {
-          isNew = false;
-          restaurantResult.name = existData[0].name;
-          restaurantResult.url = existData[0].url;
-        } else {
-          await insertFromDiscord(data[0]);
-          restaurantResult.name = data[0].name;
-          restaurantResult.url = data[0].urls.pc;
-        }
-      }
+      const textData = restaurantInfo[i];
+      await modifyRestaurantInfo(textData, restaurantResult);
     }
     const analysis = {
       isNew,
@@ -115,11 +54,48 @@ function findUrlsWithPatterns(text) {
 
   // すべてのURLを検索
   const urls = text.match(urlPattern);
-
   return urls || [];
 }
 
-async function extractRestaurantNames(content) {
+async function modifyHPInfo(response, url, restaurantInfo) {
+  const html = response.data;
+  // cheerioを使用してHTMLを解析
+  const $ = load(html);
+  // 必要な情報を抽出
+  if (url.includes("tabelog")) {
+    // 食べログの場合
+    // 店名を取得
+    const storeName = $("h2.display-name span").first().text().trim();
+
+    // 住所を取得
+    const address = $('th:contains("住所")')
+      .next("td")
+      .find("p.rstinfo-table__address")
+      .text()
+      .trim()
+      .replace(/\s+/g, " ");
+    restaurantInfo.push({
+      restaurantName: storeName,
+      restaurantAddress: address,
+    });
+  } else if (url.includes("hotpepper")) {
+    // ホットペッパーの場合
+    const jsonLdScript = $('script[type="application/ld+json"]').html();
+    const jsonData = JSON.parse(jsonLdScript);
+
+    // Extract store name and address details
+    const storeName = jsonData.name;
+    const address = jsonData.address;
+    const addressString = `${address.addressRegion}${address.addressLocality}${address.streetAddress}`;
+
+    restaurantInfo.push({
+      restaurantName: storeName,
+      restaurantAddress: addressString,
+    });
+  }
+}
+
+async function extractRestaurantNames(content, restaurantInfo) {
   // ここでレストラン名を抽出する処理を実装します
   const chatCompletion = await openai.chat.completions.create({
     messages: [
@@ -139,5 +115,37 @@ async function extractRestaurantNames(content) {
     ],
     model: "gpt-4o",
   });
-  return chatCompletion.choices[0].message.content;
+
+  // JSON.parseを使用して、文字列を配列に変換します
+  const jsonString = chatCompletion.choices[0].message.content.replace(
+    /'/g,
+    '"'
+  );
+  const responseArray = JSON.parse(jsonString);
+  responseArray.forEach((v) => {
+    if (v !== "Nothing") {
+      restaurantInfo.push({
+        restaurantName: v,
+        restaurantAddress: "",
+      });
+    }
+  });
+}
+
+async function modifyRestaurantInfo(textData, restaurantResult) {
+  const restaurant = `${textData.restaurantName} ${textData.restaurantAddress}`;
+  const data = await fetchHotPepperData(restaurant);
+  if (data.length > 0) {
+    const response = await fetchDBByName(data[0].name);
+    const existData = await response.json();
+    if (existData.length > 0) {
+      isNew = false;
+      restaurantResult.name = existData[0].name;
+      restaurantResult.url = existData[0].url;
+    } else {
+      await insertFromDiscord(data[0]);
+      restaurantResult.name = data[0].name;
+      restaurantResult.url = data[0].urls.pc;
+    }
+  }
 }

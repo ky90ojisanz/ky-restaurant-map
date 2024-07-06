@@ -24,7 +24,10 @@ discord.on("ready", () => {
 });
 
 discord.on("messageCreate", async (message) => {
-  if (message.author.bot) {
+  if (
+    message.author.bot ||
+    message.channelId !== process.env.TARGET_CHANNEL_ID
+  ) {
     return;
   }
   try {
@@ -37,8 +40,8 @@ discord.on("messageCreate", async (message) => {
     );
     const info = response.data;
 
-    if (info.success && info.analysis.restaurantResult.name !== "") {
-      if (info.isNes) {
+    if (Boolean(info.success) && info.analysis.restaurantResult.name !== "") {
+      if (Boolean(info.analysis.isNew)) {
         message.channel.send(
           `登録しました\n店名：${info.analysis.restaurantResult.name}\n住所：${info.analysis.restaurantResult.url}`
         );
