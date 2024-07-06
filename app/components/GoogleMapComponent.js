@@ -1,64 +1,84 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const GoogleMapComponent = ({ markers }) => {
+const GoogleMapComponent = ({ markers, center }) => {
   const mapRef = useRef(null);
-  const markersRef = useRef([]);
+  const infoWindowRef = useRef(null);
+  const [userLocation, setUserLocation] = useState(null);
 
   useEffect(() => {
-    // Google Maps API を使用して地図を初期化
-    if (!mapRef.current) {
-      mapRef.current = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 35.681236, lng: 139.767125 }, // 中心点を設定（例: 東京駅）
+    const initMap = () => {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: center,
         zoom: 15,
       });
-    }
 
-    // 既存のマーカーをクリア
-    markersRef.current.forEach((marker) => marker.setMap(null));
-    markersRef.current = [];
+      mapRef.current = map;
+      infoWindowRef.current = new google.maps.InfoWindow();
 
-    // 新しいマーカーを追加
-    markers.forEach((markerData) => {
-      const marker = new google.maps.Marker({
-        position: { lat: markerData.lat, lng: markerData.lng },
-        map: mapRef.current,
-        title: markerData.name,
-        animation: google.maps.Animation.DROP,
-      });
+      // ユーザーの位置を取得し、青いマーカーを追加
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            setUserLocation(pos);
 
-      const contentString = `
-      <div id="content">
-        <div id="siteNotice"></div>
-        <h1 id="firstHeading" class="firstHeading">店名：${markerData.name}</h1>
-        <div id="bodyContent">
-          <p><b>一言コメント：</b>${markerData.comment}</p>
-          <p>ジャンル：${markerData.genre}</p>
-          <p>アクセス：${markerData.access}</p>
-          <p>営業時間：${markerData.open}</p>
-          <p>URL： <a href=${markerData.url} target="_blank" rel="noopener">${markerData.url}</a></p>
-        </div>
-      </div>
-      `;
+            new google.maps.Marker({
+              position: pos,
+              map: map,
+              title: "Your Location",
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 2,
+              },
+            });
+          },
+          () => {
+            handleLocationError(true, infoWindowRef.current, map.getCenter());
+          }
+        );
+      } else {
+        handleLocationError(false, infoWindowRef.current, map.getCenter());
+      }
 
-      const infowindow = new google.maps.InfoWindow({
-        content: contentString,
-      });
+      // マーカーの追加
+      markers.forEach((markerData) => {
+        const marker = new google.maps.Marker({
+          position: { lat: markerData.lat, lng: markerData.lng },
+          map: map,
+          title: markerData.name,
+        });
 
-      marker.addListener("click", () => {
-        infowindow.open({
-          anchor: marker,
-          map: mapRef.current,
+        const contentString = `
+          <div id="content">
+            <div id="siteNotice"></div>
+            <h1 id="firstHeading" class="firstHeading">店名：${markerData.name}</h1>
+            <div id="bodyContent">
+              <p><b>一言コメント：</b>${markerData.comment}</p>
+              <p>ジャンル：${markerData.genre}</p>
+              <p>アクセス：${markerData.access}</p>
+              <p>営業時間：${markerData.open}</p>
+              <p>URL： <a href=${markerData.url} target="_blank" rel="noopener">${markerData.url}</a></p>
+            </div>
+          </div>
+        `;
+
+        marker.addListener("click", () => {
+          infoWindowRef.current.close(); // 前に開いていたInfoWindowを閉じる
+          infoWindowRef.current.setContent(contentString);
+          infoWindowRef.current.open(map, marker);
         });
       });
+    };
 
-      markersRef.current.push(marker);
-    });
-
-    // マーカーが1つ以上ある場合、最初のマーカーにマップの中心を移動
-    if (markers.length > 0) {
-      mapRef.current.setCenter({ lat: markers[0].lat, lng: markers[0].lng });
-    }
-  }, [markers]);
+    initMap();
+  }, [markers, center]);
 
   return (
     <div
@@ -71,6 +91,16 @@ const GoogleMapComponent = ({ markers }) => {
       }}
     ></div>
   );
+};
+
+const handleLocationError = (browserHasGeolocation, infoWindow, pos) => {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(
+    browserHasGeolocation
+      ? "Error: The Geolocation service failed."
+      : "Error: Your browser doesn't support geolocation."
+  );
+  infoWindow.open(mapRef.current);
 };
 
 export default GoogleMapComponent;

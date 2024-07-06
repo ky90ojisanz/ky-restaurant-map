@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { load } from "cheerio";
 import axios from "axios";
-import fetch from "node-fetch";
 import { fetchHotPepperData } from "../hotpepper/route";
 import { insertFromDiscord } from "../add-markers/route";
+import { fetchDBByName } from "../get-markers/route";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
@@ -12,6 +12,11 @@ const openai = new OpenAI({
 
 export async function POST(request) {
   try {
+    let isNew = true;
+    const restaurantResult = {
+      name: "",
+      url: "",
+    };
     const { content, author } = await request.json();
     const urls = findUrlsWithPatterns(content);
     const restaurantInfo = [];
@@ -62,22 +67,35 @@ export async function POST(request) {
       const jsonString = restaurantNames.replace(/'/g, '"');
       const responseArray = JSON.parse(jsonString);
       responseArray.forEach((v) => {
-        restaurantInfo.push({
-          restaurantName: v,
-          restaurantAddress: "",
-        });
+        if (v !== "Nothing") {
+          restaurantInfo.push({
+            restaurantName: v,
+            restaurantAddress: "",
+          });
+        }
       });
     }
     // ここでメッセージの解析を行います
-    console.log(responseArray);
     for (let i = 0; i < restaurantInfo.length; i++) {
       const restaurant = `${restaurantInfo[i].restaurantName} ${restaurantInfo[i].restaurantAddress}`;
       const data = await fetchHotPepperData(restaurant);
-      if (data.length > 0) await insertFromDiscord(data[0]);
+      if (data.length > 0) {
+        const response = await fetchDBByName(data[0].name);
+        const existData = await response.json();
+        if (existData.length > 0) {
+          isNew = false;
+          restaurantResult.name = existData[0].name;
+          restaurantResult.url = existData[0].url;
+        } else {
+          await insertFromDiscord(data[0]);
+          restaurantResult.name = data[0].name;
+          restaurantResult.url = data[0].urls.pc;
+        }
+      }
     }
     const analysis = {
-      messageLength: content.length,
-      // name: await extractRestaurantNames(content),
+      isNew,
+      restaurantResult,
     };
 
     return NextResponse.json({ success: true, analysis });

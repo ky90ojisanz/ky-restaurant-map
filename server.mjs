@@ -24,7 +24,9 @@ discord.on("ready", () => {
 });
 
 discord.on("messageCreate", async (message) => {
-  console.log(`Received message: ${message.content}`);
+  if (message.author.bot) {
+    return;
+  }
   try {
     const response = await axios.post(
       `${process.env.NEXTAUTH_URL}/api/discord-messages`,
@@ -33,7 +35,19 @@ discord.on("messageCreate", async (message) => {
         author: message.author.username,
       }
     );
-    console.log(response.data);
+    const info = response.data;
+
+    if (info.success && info.analysis.restaurantResult.name !== "") {
+      if (info.isNes) {
+        message.channel.send(
+          `登録しました\n店名：${info.analysis.restaurantResult.name}\n住所：${info.analysis.restaurantResult.url}`
+        );
+      } else {
+        message.channel.send(
+          `すでに登録されています\n店名：${info.analysis.restaurantResult.name}\n住所：${info.analysis.restaurantResult.url}`
+        );
+      }
+    }
   } catch (error) {
     console.error("Error forwarding message to Next.js app:", error);
   }

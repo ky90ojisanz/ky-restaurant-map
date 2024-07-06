@@ -1,10 +1,9 @@
-"use client"; // クライアント側で動作するコンポーネントとして指定
+"use client";
 
 import { useState } from "react";
 import Modal from "react-modal";
 import axios from "axios";
 
-// クライアント側でのみ実行
 if (typeof window !== "undefined") {
   Modal.setAppElement("body");
 }
@@ -13,8 +12,6 @@ const SearchModal = ({ onModalClose, onShopSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const [message, setMessage] = useState("");
-  const [comment, setComment] = useState("");
 
   const openModal = () => {
     setIsOpen(true);
@@ -22,13 +19,33 @@ const SearchModal = ({ onModalClose, onShopSelect }) => {
 
   const closeModal = () => {
     setIsOpen(false);
-    setResults([]); // モーダルを閉じたときに結果をクリア
+    setQuery("");
+    setResults([]);
+  };
+
+  const closeModalSave = () => {
+    setIsOpen(false);
+    setQuery("");
+    setResults([]);
     if (onModalClose) {
-      onModalClose(); // モーダルを閉じる際に親コンポーネントに通知
+      onModalClose();
     }
   };
 
-  const selectShop = async (shop) => {
+  const handleSave = async (shop, comment) => {
+    const params = { name: shop.name };
+    const shopName = new URLSearchParams(params);
+    const response = await fetch(`/api/get-markers?${shopName}`);
+    const data = await response.json();
+    if (data.length > 0) {
+      setResults((prevResults) =>
+        prevResults.map((r) =>
+          r.id === shop.id ? { ...r, message: "既に登録されています。" } : r
+        )
+      );
+      return;
+    }
+
     try {
       const restaurant = {
         name: shop.name,
@@ -40,12 +57,28 @@ const SearchModal = ({ onModalClose, onShopSelect }) => {
         lat: parseFloat(shop.lat),
         lng: parseFloat(shop.lng),
       };
-      onShopSelect(restaurant); // 親コンポーネントに選択した店舗情報を通知
+      const response = await fetch("/api/add-markers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(restaurant),
+      });
+
+      const result = await response.json();
+      setResults((prevResults) =>
+        prevResults.map((r) =>
+          r.id === shop.id ? { ...r, message: "保存しました。" } : r
+        )
+      );
     } catch (error) {
-      console.error("Error saving data:", error);
-      setMessage("Error saving data.");
+      setResults((prevResults) =>
+        prevResults.map((r) =>
+          r.id === shop.id ? { ...r, message: "DBに保存できませんでした" } : r
+        )
+      );
     }
-    closeModal();
+    closeModalSave();
   };
 
   const handleSearch = () => {
@@ -57,7 +90,9 @@ const SearchModal = ({ onModalClose, onShopSelect }) => {
       promise
         .then((response) => response.json())
         .then((jsondata) => {
-          setResults(jsondata);
+          setResults(
+            jsondata.map((shop) => ({ ...shop, comment: "", message: "" }))
+          );
         });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -76,8 +111,13 @@ const SearchModal = ({ onModalClose, onShopSelect }) => {
         contentLabel="Search Modal"
       >
         <h1>
-          <strong>飲食店検索</strong>
+          <strong>飲食店DB保存画面</strong>
         </h1>
+        <h2>
+          HotPepperグルメサーチAPIを使って飲食店を検索
+          <br />
+          検索した店情報をDBに保存することができます。
+        </h2>
         <div style={controlStyle}>
           <input
             type="text"
@@ -110,17 +150,28 @@ const SearchModal = ({ onModalClose, onShopSelect }) => {
                     <p>{shop.open}</p>
                     <input
                       type="text"
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
+                      value={shop.comment}
+                      onChange={(e) => {
+                        setResults((prevResults) =>
+                          prevResults.map((r) =>
+                            r.id === shop.id
+                              ? { ...r, comment: e.target.value }
+                              : r
+                          )
+                        );
+                      }}
                       placeholder="一言コメント"
                       style={commentStyle}
                     />
                     <button
                       style={confirmButtonStyle}
-                      onClick={() => selectShop(shop)}
+                      onClick={() => handleSave(shop, shop.comment)}
                     >
-                      選択
+                      保存
                     </button>
+                    {shop.message && (
+                      <p style={{ color: "red" }}>{shop.message}</p>
+                    )}
                   </li>
                 ))}
               </ul>
