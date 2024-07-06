@@ -9,11 +9,8 @@ import { insertFromDiscord } from "../add-markers/route";
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
 });
-const apiEndpoint = `https://phantomjscloud.com/api/browser/v2/${process.env.PHANTOMJSCLOUD_KEY}/?request=%7Burl:%22`;
 
 export async function POST(request) {
-  // PhantomJsCloud APIエンドポイント
-
   try {
     const { content, author } = await request.json();
     const urls = findUrlsWithPatterns(content);
@@ -72,10 +69,11 @@ export async function POST(request) {
       });
     }
     // ここでメッセージの解析を行います
+    console.log(responseArray);
     for (let i = 0; i < restaurantInfo.length; i++) {
       const restaurant = `${restaurantInfo[i].restaurantName} ${restaurantInfo[i].restaurantAddress}`;
       const data = await fetchHotPepperData(restaurant);
-      await insertFromDiscord(data[0]);
+      if (data.length > 0) await insertFromDiscord(data[0]);
     }
     const analysis = {
       messageLength: content.length,
