@@ -6,7 +6,7 @@ import { insertFromDiscord } from "../add-markers/route";
 import { fetchDBByName } from "../get-markers/route";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
+  apiKey: process.env.OPENAI_API_KEY ?? "", // This is the default and can be omitted
 });
 
 export async function POST(request) {
