@@ -9,7 +9,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - Googleドライブに存在する「.env.local」ファイルをダウンロードする
   - ファイル名が変更されている場合は手動で更新する
 - Gitをインストールする
-  - https://git-scm.com/downloads から最新版をダウンロードする
+  - [Gitダウンロード](https://git-scm.com/downloads) から最新版をダウンロードする
   - バージョンは2.45.2で確認済み
 - GitHubにサインインし、ソースをCloneする
   - https://github.com/ky90ojisanz/ky-restaurant-map にアクセスする
