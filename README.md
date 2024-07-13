@@ -3,7 +3,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## 環境構築手順
 
 - BitWardenのパスワード保管庫にアクセスし、下記からログインする
-  - https://vault.bitwarden.com/#/login
+  - [BitWarden Login](https://vault.bitwarden.com/#/login)
     - ログインユーザ・パスワード: Discordの開発チャンネルにピン止めしているものを参照すること
   - ここにGitHub、Googleのログイン情報を保存している。以後のサービスログイン情報はここのものを利用する
 - Googleドライブに存在する「.env.local」ファイルをダウンロードする
