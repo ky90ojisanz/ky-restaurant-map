@@ -14,7 +14,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - GitHubにサインインし、ソースをCloneする
   - https://github.com/ky90ojisanz/ky-restaurant-map にアクセスする
   - 緑色の「<> Code」ボタンを押下し、「HTTPS」タブのURLをコピーする
-    - https://github.com/ky90ojisanz/ky-restaurant-map.git
+    - [リポジトリURL](https://github.com/ky90ojisanz/ky-restaurant-map.git)
   - Gitを起動し、インストールしたい任意のフォルダにクローンする
     - コマンドは「git clone https://github.com/ky90ojisanz/ky-restaurant-map.git」
 - ダウンロードした「.env.local」ファイルを上記のフォルダのrootに保存する
