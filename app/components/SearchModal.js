@@ -8,7 +8,7 @@ if (typeof window !== "undefined") {
   Modal.setAppElement("body");
 }
 
-const SearchModal = ({ onModalClose }) => {
+const SearchModal = ({ onModalClose, onShopSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -54,8 +54,8 @@ const SearchModal = ({ onModalClose }) => {
         access: shop.access,
         open: shop.open,
         url: shop.urls.pc,
-        lat: shop.lat,
-        lng: shop.lng,
+        lat: parseFloat(shop.lat),
+        lng: parseFloat(shop.lng),
       };
       const response = await fetch("/api/add-markers", {
         method: "POST",

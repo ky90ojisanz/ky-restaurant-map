@@ -40,3 +40,32 @@ export async function GET(req) {
     );
   }
 }
+
+export async function fetchDBByName(name) {
+  try {
+    // Supabaseクエリを作成
+    let query = supabase.from("restaurants").select("*");
+
+    // nameパラメータが指定されている場合、where句を追加
+    if (name) {
+      query = query.eq("name", name);
+    }
+
+    // クエリを実行
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching data:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // データをクライアントに返す
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { error: "Unexpected error occurred" },
+      { status: 500 }
+    );
+  }
+}

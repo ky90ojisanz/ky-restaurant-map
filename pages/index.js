@@ -16,10 +16,10 @@ const Map = () => {
   });
 
   const [markers, setMarkers] = useState([]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { data: session, status } = useSession();
   const [updateMarkers, setUpdateMarkers] = useState(false);
   const [mapCenter, setMapCenter] = useState(null);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const router = useRouter();
 
   const fetchMarkersFromDB = useCallback(async () => {
@@ -29,6 +29,17 @@ const Map = () => {
       if (Array.isArray(data) && data.length > 0) setMarkers(data);
     }
   }, []);
+
+  useEffect(() => {
+    if (isInitialLoad) {
+      fetchMarkersFromDB();
+      setIsInitialLoad(false);
+    }
+  }, [fetchMarkersFromDB, isInitialLoad]);
+
+  useEffect(() => {
+    fetchMarkersFromDB();
+  }, [fetchMarkersFromDB, updateMarkers]);
 
   useEffect(() => {
     if (status === "loading") return; // セッションの読み込み中は何もしない

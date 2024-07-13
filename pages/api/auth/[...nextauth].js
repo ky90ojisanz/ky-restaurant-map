@@ -8,7 +8,10 @@ export default NextAuth({
       clientId: process.env.DISCORD_CLIENT_ID,
       clientSecret: process.env.DISCORD_CLIENT_SECRET,
       authorization: {
-        params: { scope: "identify email guilds" },
+        params: {
+          scope: "identify email guilds",
+          redirect_uri: process.env.DISCORD_REDIRECT_URI,
+        },
       },
     }),
   ],
