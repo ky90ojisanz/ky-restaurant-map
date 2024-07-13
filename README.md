@@ -12,7 +12,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
   - [Gitダウンロード](https://git-scm.com/downloads) から最新版をダウンロードする
   - バージョンは2.45.2で確認済み
 - GitHubにサインインし、ソースをCloneする
-  - https://github.com/ky90ojisanz/ky-restaurant-map にアクセスする
+  - [GitHubリポジトリ](https://github.com/ky90ojisanz/ky-restaurant-map) にアクセスする
   - 緑色の「<> Code」ボタンを押下し、「HTTPS」タブのURLをコピーする
     - [リポジトリURL](https://github.com/ky90ojisanz/ky-restaurant-map.git)
   - Gitを起動し、インストールしたい任意のフォルダにクローンする
